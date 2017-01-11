@@ -774,16 +774,30 @@ export default class ImageGallery extends React.Component {
       const renderItem = item.renderItem ||
         this.props.renderItem || this._renderItem.bind(this);
 
-      const slide = (
-        <div
-          key={index}
-          className={'image-gallery-slide' + alignment + originalClass}
-          style={Object.assign(this._getSlideStyle(index), this.state.style)}
-          onClick={this.props.onClick}
-        >
-          {renderItem(item)}
-        </div>
-      );
+      let slide = '';
+      if (this.props.type && this.props.type === '3d') {
+        slide = (
+          <div
+            key={index}
+            className={'image-gallery-slide three-d' + alignment + originalClass}
+            style={Object.assign(this._getSlideStyle(index), this.state.style)}
+            onClick={this.props.onClick}
+          >
+            <iframe src={item.original} className="videoIframe"></iframe>
+          </div>
+        );
+      } else {
+        slide = (
+          <div
+            key={index}
+            className={'image-gallery-slide' + alignment + originalClass}
+            style={Object.assign(this._getSlideStyle(index), this.state.style)}
+            onClick={this.props.onClick}
+          >
+            {renderItem(item)}
+          </div>
+        );
+      }
 
       if (this.props.lazyLoad) {
         if (alignment || this._lazyLoaded[index]) {
@@ -800,27 +814,44 @@ export default class ImageGallery extends React.Component {
       }
 
       if (this.props.showThumbnails) {
-        thumbnails.push(
-          <a
-            onMouseOver={this._handleMouseOverThumbnails.bind(this, index)}
-            onMouseLeave={this._handleMouseLeaveThumbnails.bind(this, index)}
-            key={index}
-            className={
-              'image-gallery-thumbnail' +
-              (currentIndex === index ? ' active' : '') +
-              thumbnailClass
-            }
+        if (this.props.type && this.props.type === '3d') {
+          thumbnails.push(
+            <a
+              onMouseOver={this._handleMouseOverThumbnails.bind(this, index)}
+              onMouseLeave={this._handleMouseLeaveThumbnails.bind(this, index)}
+              key={index}
+              className={
+                'image-gallery-thumbnail three-d' +
+                (currentIndex === index ? ' active' : '') +
+                thumbnailClass
+              }
+              onClick={event => this.slideToIndex.call(this, index, event)}>
+              <iframe src={item.thumbnail}></iframe>
+            </a>
+          );
+        } else {
+          thumbnails.push(
+            <a
+              onMouseOver={this._handleMouseOverThumbnails.bind(this, index)}
+              onMouseLeave={this._handleMouseLeaveThumbnails.bind(this, index)}
+              key={index}
+              className={
+                'image-gallery-thumbnail' +
+                (currentIndex === index ? ' active' : '') +
+                thumbnailClass
+              }
 
-            onClick={event => this.slideToIndex.call(this, index, event)}>
-              <img
-                src={item.thumbnail}
-                alt={item.thumbnailAlt}
-                onError={onThumbnailError.bind(this)}/>
-              <div className='image-gallery-thumbnail-label'>
-                {item.thumbnailLabel}
-              </div>
-          </a>
-        );
+              onClick={event => this.slideToIndex.call(this, index, event)}>
+                <img
+                  src={item.thumbnail}
+                  alt={item.thumbnailAlt}
+                  onError={onThumbnailError.bind(this)}/>
+                <div className='image-gallery-thumbnail-label'>
+                  {item.thumbnailLabel}
+                </div>
+            </a>
+          );
+        }
       }
 
       if (this.props.showBullets) {

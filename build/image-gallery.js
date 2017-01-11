@@ -741,16 +741,30 @@ var ImageGallery = function (_React$Component) {
 
         var renderItem = item.renderItem || _this7.props.renderItem || _this7._renderItem.bind(_this7);
 
-        var slide = _react2.default.createElement(
-          'div',
-          {
-            key: index,
-            className: 'image-gallery-slide' + alignment + originalClass,
-            style: _extends(_this7._getSlideStyle(index), _this7.state.style),
-            onClick: _this7.props.onClick
-          },
-          renderItem(item)
-        );
+        var slide = '';
+        if (_this7.props.type && _this7.props.type === '3d') {
+          slide = _react2.default.createElement(
+            'div',
+            {
+              key: index,
+              className: 'image-gallery-slide three-d' + alignment + originalClass,
+              style: _extends(_this7._getSlideStyle(index), _this7.state.style),
+              onClick: _this7.props.onClick
+            },
+            _react2.default.createElement('iframe', { src: item.original, className: 'videoIframe' })
+          );
+        } else {
+          slide = _react2.default.createElement(
+            'div',
+            {
+              key: index,
+              className: 'image-gallery-slide' + alignment + originalClass,
+              style: _extends(_this7._getSlideStyle(index), _this7.state.style),
+              onClick: _this7.props.onClick
+            },
+            renderItem(item)
+          );
+        }
 
         if (_this7.props.lazyLoad) {
           if (alignment || _this7._lazyLoaded[index]) {
@@ -767,27 +781,42 @@ var ImageGallery = function (_React$Component) {
         }
 
         if (_this7.props.showThumbnails) {
-          thumbnails.push(_react2.default.createElement(
-            'a',
-            {
-              onMouseOver: _this7._handleMouseOverThumbnails.bind(_this7, index),
-              onMouseLeave: _this7._handleMouseLeaveThumbnails.bind(_this7, index),
-              key: index,
-              className: 'image-gallery-thumbnail' + (currentIndex === index ? ' active' : '') + thumbnailClass,
+          if (_this7.props.type && _this7.props.type === '3d') {
+            thumbnails.push(_react2.default.createElement(
+              'a',
+              {
+                onMouseOver: _this7._handleMouseOverThumbnails.bind(_this7, index),
+                onMouseLeave: _this7._handleMouseLeaveThumbnails.bind(_this7, index),
+                key: index,
+                className: 'image-gallery-thumbnail three-d' + (currentIndex === index ? ' active' : '') + thumbnailClass,
+                onClick: function onClick(event) {
+                  return _this7.slideToIndex.call(_this7, index, event);
+                } },
+              _react2.default.createElement('iframe', { src: item.thumbnail })
+            ));
+          } else {
+            thumbnails.push(_react2.default.createElement(
+              'a',
+              {
+                onMouseOver: _this7._handleMouseOverThumbnails.bind(_this7, index),
+                onMouseLeave: _this7._handleMouseLeaveThumbnails.bind(_this7, index),
+                key: index,
+                className: 'image-gallery-thumbnail' + (currentIndex === index ? ' active' : '') + thumbnailClass,
 
-              onClick: function onClick(event) {
-                return _this7.slideToIndex.call(_this7, index, event);
-              } },
-            _react2.default.createElement('img', {
-              src: item.thumbnail,
-              alt: item.thumbnailAlt,
-              onError: onThumbnailError.bind(_this7) }),
-            _react2.default.createElement(
-              'div',
-              { className: 'image-gallery-thumbnail-label' },
-              item.thumbnailLabel
-            )
-          ));
+                onClick: function onClick(event) {
+                  return _this7.slideToIndex.call(_this7, index, event);
+                } },
+              _react2.default.createElement('img', {
+                src: item.thumbnail,
+                alt: item.thumbnailAlt,
+                onError: onThumbnailError.bind(_this7) }),
+              _react2.default.createElement(
+                'div',
+                { className: 'image-gallery-thumbnail-label' },
+                item.thumbnailLabel
+              )
+            ));
+          }
         }
 
         if (_this7.props.showBullets) {
